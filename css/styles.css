@@ -129,6 +129,7 @@ svg{
     height: 100vh;
     display: block;
     float: left;
+    overflow-y: scroll;
 }
 .canvas{
   width: 65%;
@@ -139,4 +140,7 @@ svg{
   width: 100%;
       cursor: default;
 }
-
+.thesys{
+  border-bottom: 1px solid white;
+  padding-bottom: 15px; 
+}

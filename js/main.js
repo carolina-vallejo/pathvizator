@@ -1,4 +1,4 @@
-function dibujargraphs(transformobj) {
+function dibujargraphs(transformobj, numsystem) {
 
   /*---------------------------------------------------------------
     CANVAS
@@ -7,7 +7,7 @@ function dibujargraphs(transformobj) {
 
   //clean coords
   todocoords = [];
-  //console.log('clean: ' + JSON.stringify( todocoords ));
+  ////console.log('clean: ' + JSON.stringify( todocoords ));
 
   /*---------------------------------------------------------------
     SYSTEM
@@ -23,25 +23,7 @@ function dibujargraphs(transformobj) {
   //=========================================================================
   //=========================================================================
 
-  var objcfgcircle = {
-    'offorig': {
-      x: transformobj.circle.sliders.posx * (canvasobj.posx / 100),
-      y: transformobj.circle.sliders.posy * (canvasobj.posy / 100)
-    },
-    'arr': dataset,
-    'grades': transformobj.circle.sliders.grades * (360 / 100),
-    'radio': transformobj.circle.sliders.radio * ((canvasobj.posx / 2) / 100),
-    'rotation': transformobj.circle.sliders.rotation * (180 / 100),
-    'strokew': transformobj.circle.sliders.strokew,
-    'strokedata': transformobj.circle.checkboxes.strokedata
-  };
 
-  var objcategory = {
-    'factor': transformobj.category.sliders.rotation,
-    'rotation': transformobj.category.checkboxes.rotate,
-    'off': transformobj.category.sliders.off
-
-  };
 
   scalecol = d3.scale.linear()
     .domain([getMinOfArray(dataset), getMaxOfArray(dataset) / 1.4, getMaxOfArray(dataset)])
@@ -51,10 +33,15 @@ function dibujargraphs(transformobj) {
     .domain([-1, 0, 1])
     .range(["rgb(200, 200, 200)", "rgb(80,80,80)", "rgb(60,60,60)"]);
 
-  donutmaker(objcfgcircle, objcategory);
+
+    for(var i=0; i<numsystem; i++){
+     // //console.log(transformobj[i]);
+     donutmaker(transformobj[i].systemcircle, i);
+     //console.log('inside: ' + i);
+    }
+  
 
   ////---- NEW CONNECTORS
-  //drawsystemconnector(0, 1, dataset);
   drawsystemconnector(0, 1, dataset);
 
 } //----dibujargraphs
@@ -88,7 +75,9 @@ var offy = 0;
 
 var color, scalecol;
 
-function drawarcs(i, objcfg, d) {
+function drawarcs(i, objcfg, d, wrap) {
+
+  //console.log(wrap);
   var raddata = circlecoords(objcfg);
 
   var angles = raddata[2];
@@ -96,7 +85,7 @@ function drawarcs(i, objcfg, d) {
   var svgns = "http://www.w3.org/2000/svg";
 
   var aPath3 = document.createElementNS(svgns, 'path');
-  document.getElementById('svg-wrap').appendChild(aPath3);
+  document.getElementById(wrap).appendChild(aPath3);
 
   aPath3.setAttribute('d',
     ' M' + (raddata[0][i].rx) + ',' + (raddata[0][i].ry) +
@@ -173,7 +162,7 @@ var canvasobj = {
   posy: $('#svg-wrap').outerHeight()
 };
 
-function radioselemts(obj, objradians) {
+function radioselemts(obj, objradians, index) {
   var graph = d3.select("#svg-wrap");
 
   var data = dataset;
@@ -184,10 +173,10 @@ function radioselemts(obj, objradians) {
   var radianlabel = circlecoords(objradians, obj.off);
   graph.append("svg:g")
     .attr({
-      'id': 'elcircle'
+      'id': 'elcircle_'+ index
     });
 
-  graph.select('#elcircle').selectAll()
+  graph.select('#elcircle_' + index).selectAll()
     .data(data)
     .enter() //----creates elements!!!
     .append("svg:text")
@@ -217,20 +206,47 @@ function radioselemts(obj, objradians) {
     }); //---final labels
 }
 
-function donutmaker(objtrans, objcat) {
+function donutmaker(objprop, index) {
+
+  //------object config
+  var objcfgcircle = {
+    'offorig': {
+      x: objprop.circle.sliders.posx * (canvasobj.posx / 100),
+      y: objprop.circle.sliders.posy * (canvasobj.posy / 100)
+    },
+    'arr': dataset,
+    'grades': objprop.circle.sliders.grades * (360 / 100),
+    'radio': objprop.circle.sliders.radio * ((canvasobj.posx / 2) / 100),
+    'rotation': objprop.circle.sliders.rotation * (180 / 100),
+    'strokew': objprop.circle.sliders.strokew,
+    'strokedata': objprop.circle.checkboxes.strokedata
+  };
+
+  var objcategory = {
+    'factor': objprop.category.sliders.rotation,
+    'rotation': objprop.category.checkboxes.rotate,
+    'off': objprop.category.sliders.off
+
+  };
+
+
   var data = dataset;
   var systemid = coordsregister('circle', data);
 
+  var circle = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+  document.getElementById('svg-wrap').appendChild(circle);
+  circle.setAttribute('id','arcswrap_' + index);
+
   for (var itemdata in data) {
     var i = parseInt(itemdata);
-    var radianlabel = circlecoords(objtrans);
+    var radianlabel = circlecoords(objcfgcircle);
 
-    drawarcs(i, objtrans, data[i]);
+    drawarcs(i, objcfgcircle, data[i], 'arcswrap_' + index);
     //mostrar si se habilita conector!
     todocoords[systemid].system.points.push({ 'x': radianlabel[0][i].cx, 'y': radianlabel[0][i].cy });
   } //----for...
 
-  radioselemts(objcat, objtrans);
+  radioselemts(objcategory, objcfgcircle, index);
 
 } //---donutmaker
 /////////////////////////////////
@@ -248,8 +264,8 @@ function coordsregister(tipo, data) {
       points: []
     }
   });
-  //console.log('coords registradas: ' + tipo);
-  //console.log(JSON.stringify(todocoords));
+  ////console.log('coords registradas: ' + tipo);
+  ////console.log(JSON.stringify(todocoords));
 
   return (todocoords.length - 1);
 }
@@ -319,4 +335,4 @@ function getMaxOfArray(arrr) {
 function getMinOfArray(arrr) {
   return Math.min.apply(null, arrr);
 }
-//////////console.log(JSON.stringify(coordsmiddle));
+////////////console.log(JSON.stringify(coordsmiddle));

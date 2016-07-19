@@ -2,68 +2,74 @@ $(document).ready(function() {
 
   dropdownpanel();
 
-  dibujargraphs(setprops.systemcircle);
-  
   var $wrap_ui = $('.wrap-ui-system');
 
   //------
 
+  $("form").submit(function(event) {
 
-    $( "form" ).submit(function( event ) {
+    $('.wrap-ui-system').empty(); //---ojo mirar para cuando hayan rects
 
-      console.log($( "select option:selected" ).text());
-      console.log($( 'input[type="text"]' ).val());
+    //console.log($( "select option:selected" ).text());
+    //console.log($( 'input[type="text"]' ).val());
 
-      var numsystem= $.isNumeric( $( 'input[type="text"]' ).val() ) ? parseInt( $( 'input[type="text"]' ).val() ) : 0;
+    numsystem = $.isNumeric($('input[type="text"]').val()) ? parseInt($('input[type="text"]').val()) : 1;
 
-      setprops['circle_0']={};
-      setprops['circle_0'].sliders= {
-        posx: 50,
-        posy: 50,
-        grades:50, //---ojo de 0-100
-        radio:50,
-        rotation:0,
-        strokew:1
-      }; 
- 
-      event.preventDefault();
-    });
+    for (var i = 0; i < numsystem; i++) {
 
-  //------ 
-  circle_system_ui(0);
+      if (i < numsystem - 1) {
+
+        var clonecirclesys = JSON.parse(JSON.stringify(setprops[0]));
+        setprops.push(clonecirclesys);
+        
+
+      }
+      setprops[i].systemcircle.circle.sliders.radio =  (i * 10) + 30;
+      circle_system_ui(i);
+    }
+
+    dibujargraphs(setprops, numsystem);
+
+    console.log('reescribiendo props: '+ JSON.stringify(setprops) );
+
+    event.preventDefault();
+  });
+
+
 
 }); //----ready
-
-var setprops = {
-  systemcircle:{
+var numsystem;
+//---ojo crear otro objeto default para rects!
+var setprops = [{
+  systemcircle: {
     circle: {
       sliders: {
         posx: 50,
         posy: 50,
-        grades:50, //---ojo de 0-100
-        radio:50,
-        rotation:0,
-        strokew:1
+        grades: 50, //---ojo de 0-100
+        radio: 50,
+        rotation: 0,
+        strokew: 1
       },
       checkboxes: {
-        strokedata:true,
-        labels:true
+        strokedata: true,
+        labels: true
       }
     },
-    category:{
-      sliders:{
-        rotation:100,
-        off:10
+    category: {
+      sliders: {
+        rotation: 100,
+        off: 10
       },
       checkboxes: {
-        rotate:true
-      }   
+        rotate: true
+      }
     }
   }
-};
+}];
 
-
-function slidermaker(obj, elm) {
+function slidermaker(obj, elm, count) {
+  //console.log('xoy slidermaker: ' + JSON.stringify( setprops[count] ));
 
   var num = Object.keys(obj.sliders).length;
 
@@ -84,13 +90,13 @@ function slidermaker(obj, elm) {
 
     return htmlslider;
   }
-
-  var $rectsys = $('.' + elm + ' .uiwrap');
+  var $parent = $('#systemcircle_' + count);
+  var $rectsys = $parent.find('.' + elm + ' .uiwrap');
   for (var i = 1; i <= num; i++) {
 
     $rectsys.append(htmlsliderfn(i));
 
-    $('#' + elm + propsnames[i - 1]).slider({
+    $parent.find('#' + elm + propsnames[i - 1]).slider({
       min: 1,
       max: 100,
       value: obj.sliders[propsnames[i - 1]],
@@ -99,25 +105,20 @@ function slidermaker(obj, elm) {
       }
     });
   }
+
   function inchangeslider($elm) {
-    var idstr=$elm.attr('id');
-    idstr=idstr.replace(elm, '');
+    var idstr = $elm.attr('id');
+    idstr = idstr.replace(elm, '');
 
-    
-    var system = elm;
-    system = system.substring(0, system.indexOf('_'));
-    setprops.systemcircle[system].sliders[idstr] = $elm.slider('value');
+    //---escribir props  
+    setprops[count].systemcircle[elm].sliders[idstr] = $elm.slider('value');
 
-
-
-    //console.log(JSON.stringify(setprops['circle_0']));
-    dibujargraphs(setprops.systemcircle);
+    //console.log('xoy inchange' + JSON.stringify( setprops ) + ' $elm: ' + $elm );
+    dibujargraphs(setprops,numsystem);
   }
 } //------slidermaker
 
-
-
-function checkboxmaker(obj, elm) {
+function checkboxmaker(obj, elm, count) {
 
   var num = Object.keys(obj.checkboxes).length;
 
@@ -138,7 +139,8 @@ function checkboxmaker(obj, elm) {
 
     return htmlcheckbox;
   }
-  var $rectsys = $('.' + elm + ' .uiwrap');
+  var $parent = $('#systemcircle_' + count);
+  var $rectsys = $parent.find('.' + elm + ' .uiwrap');
   for (var i = 1; i <= num; i++) {
     $rectsys.append(htmlcheckboxfn(i));
   } //---for
@@ -146,47 +148,48 @@ function checkboxmaker(obj, elm) {
   $rectsys.on('click', '.tooglebox', function(e) {
 
     var $this = $(this);
-    var idstr=$this.attr('id');
-    idstr=idstr.replace(elm, '');
-
-    var system = elm;
-    system = system.substring(0, system.indexOf('_'));
-    //console.log(system);
+    var idstr = $this.attr('id');
+    idstr = idstr.replace(elm, '');
 
     if ($this.hasClass('checked')) {
       $this.removeClass('checked');
-      setprops.systemcircle[system].checkboxes[idstr] = true;
-      dibujargraphs(setprops.systemcircle);
+      setprops[count].systemcircle[elm].checkboxes[idstr] = true;
+      dibujargraphs(setprops,numsystem);
     } else {
       $this.addClass('checked');
-      setprops.systemcircle[system].checkboxes[idstr] = false;
-      dibujargraphs(setprops.systemcircle);
+      setprops[count].systemcircle[elm].checkboxes[idstr] = false;
+      dibujargraphs(setprops,numsystem);
     }
 
   });
 
 } //------slidermaker
 
-function dropdownpanel(){
-  $('.wrap-ui-system').on('click','h2',function(){
+function category_ui(wrap, count) {
+  $('.wrap-ui-system ' + wrap).append('<div class="category"><h2>Categories</h2><div class="uiwrap"></div></div>');
+  slidermaker(setprops[count].systemcircle.category, 'category', count);
+  checkboxmaker(setprops[count].systemcircle.category, 'category', count);
+}
+
+function circle_system_ui(count) {
+
+  $('.wrap-ui-system').append('<div id="systemcircle_' + count + '" class="thesys"></div>');
+  $('#systemcircle_' + count).append('<div class="circle"><h2>Circle sistem</h2><div class="uiwrap"></div></div>');
+  slidermaker(setprops[count].systemcircle.circle, 'circle', count);
+  checkboxmaker(setprops[count].systemcircle.circle, 'circle', count);
+
+  category_ui('#systemcircle_' + count, count);
+}
+
+function dropdownpanel() {
+  $('.wrap-ui-system').on('click', 'h2', function() {
     $(this).toggleClass('do').next().slideToggle();
   });
 }
 
- function category_ui(count){
-  $('.wrap-ui-system').append('<div class="category_'+count+'"><h2>Categories</h2><div class="uiwrap"></div></div>');
-  slidermaker(setprops.systemcircle.category, 'category_'+count);
-  checkboxmaker(setprops.systemcircle.category, 'category_'+count);
- }
- function circle_system_ui(count){
-  var count="";
-    $('.wrap-ui-system').append('<div class="circle_'+count+'"><h2>Circle sistem</h2><div class="uiwrap"></div></div>');
-    slidermaker(setprops.systemcircle.circle, 'circle_'+count);
-    checkboxmaker(setprops.systemcircle.circle, 'circle_'+count);
-
-    category_ui(0);
- }
 /********************
+
+
 
   ////////// A TENER EN CUENTA LIST
 
@@ -201,6 +204,7 @@ function dropdownpanel(){
     - mejorar los sliders, que se vea el valor
     - ojo como hacer que el slider de saltos en los valores!
     - ojo como hacer cuando un checkbox habilita otras configs
+    - hacer dialogos de error
 
   IMPLEMENTAR UI:  
     - btn reset
@@ -233,20 +237,21 @@ function dropdownpanel(){
 
     CIRCLE
     - ojo con muchos datos poder cambiar la escala del stroke data!
-
+  
+  MEJORAS DATA
+    - dar la opcion de conectar con drivesheets
+    - dar la opcion de ordenar los datos de mayor a menor
+    - Data inputs! a. simple b. complejos    
   
   OTHER SYSTEMS:
     - poder hacer bloques de data, masonrys
     - random position for circles or rects
 
-  DATA:    
-    - dar la opcion de ordenar los datos de mayor a menor
-    - Data inputs! a. simple b. complejos
-
   MAS OPCIONES:
   - permitir cambiar los textos por lineas
   - poder conectar con líneas valores repetidos dentro del mismo chart
-
+  - reajustar el grap en resize!
+  
   /////////// TO_THINK LIST
   - como desplegar las opciones para cada chart?
   - Como relacionar valores? sub charts, encima de las barras o de las líneas, como meter data en systemas? 
