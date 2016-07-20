@@ -6,7 +6,7 @@ $(document).ready(function() {
 
   //------
 
-  $("form").submit(function(event) {
+  $("#seltsystem").submit(function(event) {
 
     $('.wrap-ui-system').empty(); //---ojo mirar para cuando hayan rects
 
@@ -30,7 +30,7 @@ $(document).ready(function() {
 
     dibujargraphs(setprops, numsystem);
 
-    console.log('reescribiendo props: '+ JSON.stringify(setprops) );
+    //console.log('reescribiendo props: '+ JSON.stringify(setprops) );
 
     event.preventDefault();
   });

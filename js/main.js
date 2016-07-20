@@ -42,9 +42,36 @@ function dibujargraphs(transformobj, numsystem) {
   
 
   ////---- NEW CONNECTORS
-  drawsystemconnector(0, 1, dataset);
+  var allcheckhtml='';
+
+  for(var i=0;i<todocoords.length;i++){
+    allcheckhtml += '<input type="checkbox" name="'+ 
+                    todocoords[i].system.tipo+'_'+i +
+                    '" value="'+todocoords[i].system.tipo+'_'+i+'">'
+                    +todocoords[i].system.tipo+'_'+i;
+
+  }
+
+  $('#selconnector').append(allcheckhtml).css('display','block');
+
+  $("#selconnector").submit(function(event) {
+    //console.log($(this));
+    $( "#selconnector input[type=checkbox]" ).each(function(){
+     
+      if($(this).prop('checked')){
+         console.log($(this).attr('name'));
+      }
+    });
+    event.preventDefault();
+  });
+
+  //drawsystemconnector(0, 1, dataset);
+  
+  
+
 
 } //----dibujargraphs
+
 function drawsystemconnector(id1, id2, data) {
   //---create wraps-OJO HACER UNO POR CADA SYSTEMA
   var connectwrap = document.createElementNS("http://www.w3.org/2000/svg", 'g');
