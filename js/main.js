@@ -3,11 +3,18 @@ function dibujargraphs(transformobj, numsystem) {
   /*---------------------------------------------------------------
     CANVAS
   ----------------------------------------------------------------*/
+  //clean canvas
   $('#svg-wrap').empty();
+
+  //create back wrap content
+  var backwrap = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+  backwrap.setAttribute('id', 'backwrap');
+  document.getElementById('svg-wrap').appendChild(backwrap);
 
   //clean coords
   todocoords = [];
-  ////console.log('clean: ' + JSON.stringify( todocoords ));
+
+  
 
   /*---------------------------------------------------------------
     SYSTEM
@@ -19,64 +26,26 @@ function dibujargraphs(transformobj, numsystem) {
     CONECTORES
   ----------------------------------------------------------------*/
 
-
   //=========================================================================
   //=========================================================================
 
 
 
-  scalecol = d3.scale.linear()
-    .domain([getMinOfArray(dataset), getMaxOfArray(dataset) / 1.4, getMaxOfArray(dataset)])
-    .range([-1, 0, 1]);
 
-  color = d3.scale.linear()
-    .domain([-1, 0, 1])
-    .range(["rgb(200, 200, 200)", "rgb(80,80,80)", "rgb(60,60,60)"]);
-
-
-    for(var i=0; i<numsystem; i++){
-     // //console.log(transformobj[i]);
-     donutmaker(transformobj[i].systemcircle, i);
-     //console.log('inside: ' + i);
-    }
-  
-
-  ////---- NEW CONNECTORS
-  var allcheckhtml='';
-
-  for(var i=0;i<todocoords.length;i++){
-    allcheckhtml += '<input type="checkbox" name="'+ 
-                    todocoords[i].system.tipo+'_'+i +
-                    '" value="'+todocoords[i].system.tipo+'_'+i+'">'
-                    +todocoords[i].system.tipo+'_'+i;
-
+  //---loop donut maker  
+  for (var i = 0; i < numsystem; i++) {
+    donutmaker(transformobj[i].systemcircle, i);
   }
 
-  $('#selconnector').append(allcheckhtml).css('display','block');
-
-  $("#selconnector").submit(function(event) {
-    //console.log($(this));
-    $( "#selconnector input[type=checkbox]" ).each(function(){
-     
-      if($(this).prop('checked')){
-         console.log($(this).attr('name'));
-      }
-    });
-    event.preventDefault();
-  });
-
-  //drawsystemconnector(0, 1, dataset);
-  
-  
-
-
 } //----dibujargraphs
+
+
 
 function drawsystemconnector(id1, id2, data) {
   //---create wraps-OJO HACER UNO POR CADA SYSTEMA
   var connectwrap = document.createElementNS("http://www.w3.org/2000/svg", 'g');
   connectwrap.setAttribute('id', 'connectwrap');
-  document.getElementById('svg-wrap').appendChild(connectwrap);  
+  document.getElementById('svg-wrap').appendChild(connectwrap);
 
   for (var itemdata in data) {
 
@@ -100,11 +69,10 @@ function drawconector(x1, y1, x2, y2) {
 var offx = 0;
 var offy = 0;
 
-var color, scalecol;
 
-function drawarcs(i, objcfg, d, wrap) {
 
-  //console.log(wrap);
+function drawarcs(i, objcfg, d, wrap, color, scalecol) {
+
   var raddata = circlecoords(objcfg);
 
   var angles = raddata[2];
@@ -114,7 +82,7 @@ function drawarcs(i, objcfg, d, wrap) {
   var aPath3 = document.createElementNS(svgns, 'path');
   document.getElementById(wrap).appendChild(aPath3);
 
-  aPath3.setAttribute('d',
+   aPath3.setAttribute('d',
     ' M' + (raddata[0][i].rx) + ',' + (raddata[0][i].ry) +
     ' A' + '-' + (objcfg.radio) + ' ' + (objcfg.radio) + ' 0 ' + (angles[i] < 180 ? 0 : 1) + ' 0 ' +
     (raddata[0][i + 1].rx) + ' ' + (raddata[0][i + 1].ry)
@@ -123,20 +91,77 @@ function drawarcs(i, objcfg, d, wrap) {
   aPath3.setAttribute('stroke', color(scalecol(objcfg.arr[i])));
 
   if (!objcfg.strokedata) {
-    aPath3.setAttribute('stroke-width', objcfg.strokew * (d / 50));
-  } else {
     aPath3.setAttribute('stroke-width', objcfg.strokew);
+  } else {
+    aPath3.setAttribute('stroke-width', objcfg.strokew * (d / 50));
   }
 
   aPath3.setAttribute('fill', 'none');
 
-}
+}//---drawarcs
 
-//var dataset = [4.278098583, 2.352464008, 8.57979393, 4.717903532, 7.07036754, 4.2, 2.3333333333, 9.008321762, 126.5357450815, 87.87328, 11.3273771538, 5.4727604289, 0, 0, 100, 24.1827022451, 7.99360577730113, 137.5, 387.9047722729, 39.6724068363, 22.7407, 49.8385693954, 6.361541, 46.1956151252, 2.351122785, 4.71804376, 7.069166545, 153, 153 ,0.0046712205, 0.0046712205];
 
-var dataset = [10, 50, 100];
+function donutmaker(objprop, index) {
 
-//var dataset = [70, 20, 30, 40, 30, 30, 22, 12, 12, 12, 13, 15, 7, 23, 45, 22, 11, 11];
+  //------object config
+  var objcfgcircle = {
+    'offorig': {
+      x: objprop.circle.sliders.posx * (canvasobj.posx / 100),
+      y: objprop.circle.sliders.posy * (canvasobj.posy / 100)
+    },
+    'arr': objprop.data,
+    'grades': objprop.circle.sliders.grades * (360 / 100),
+    'radio': objprop.circle.sliders.radio * ((canvasobj.posx / 2) / 100),
+    'rotation': objprop.circle.sliders.rotation * (180 / 100),
+    'strokew': objprop.circle.sliders.strokew,
+    'strokedata': objprop.circle.checkboxes.strokedata
+  };
+
+  var objcategory = {
+    'factor': objprop.category.sliders.rotation,
+    'rotation': objprop.category.checkboxes.rotate,
+    'off': objprop.category.sliders.off,
+    'hide': objprop.category.checkboxes.hide,
+    'connect': objprop.category.checkboxes.connect
+
+  };
+
+  var data = objcfgcircle.arr;
+  var systemid = coordsregister('circle', data);
+
+  var circle = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+  document.getElementById('backwrap').appendChild(circle);
+  circle.setAttribute('id', 'arcswrap_' + index);
+
+  //---scalecolor
+ 
+  var scalecol = d3.scale.linear()
+    .domain([getMinOfArray(objprop.data), getMaxOfArray(objprop.data) / 1.4, getMaxOfArray(objprop.data)])
+    .range([-1, 0, 1]);
+
+  var color = d3.scale.linear()
+    .domain([-1, 0, 1])
+    .range(["rgb(200, 200, 200)", "rgb(80,80,80)", "rgb(60,60,60)"]);
+
+  for (var itemdata in data) {
+    var i = parseInt(itemdata);
+    var radianlabel = circlecoords(objcfgcircle);
+
+    drawarcs(i, objcfgcircle, data[i], 'arcswrap_' + index, color, scalecol);
+    //mostrar si se habilita conector!
+    todocoords[systemid].system.points.push({ 'x': radianlabel[0][i].cx, 'y': radianlabel[0][i].cy });
+  } //----for...
+
+  if (objcategory.hide) {
+    radioselemts(objcategory, objcfgcircle, index, data);
+    if (objcategory.connect) {
+      drawsystemconnector(systemid, systemid + 1, data);
+    }
+
+  }
+
+} //---donutmaker
+
 
 function circlecoords(objcfg, off) {
   var off = typeof off !== 'undefined' ? off : 0;
@@ -155,6 +180,8 @@ function circlecoords(objcfg, off) {
   var sum = getsum[0];
   var onlyangles = getsum[1];
   var sumcenter = [];
+
+  
 
   //for (var i = sum.length - 1; i >= 0; i--) {
   for (var i = 0; i < sum.length; i++) {
@@ -177,6 +204,7 @@ function circlecoords(objcfg, off) {
     coordscircle.push({ rx: rx, ry: ry, cx: cx, cy: cy });
 
   } //--- for
+  console.log('sum: ' + sumcenter);
   return [coordscircle, sum, onlyangles, sumcenter];
 } //------final coords
 
@@ -189,10 +217,9 @@ var canvasobj = {
   posy: $('#svg-wrap').outerHeight()
 };
 
-function radioselemts(obj, objradians, index) {
+function radioselemts(obj, objradians, index, data) {
   var graph = d3.select("#svg-wrap");
 
-  var data = dataset;
   var systemid = coordsregister('radio', data);
 
   // si se ha habilitado los labels para un sistema especifico,
@@ -200,10 +227,10 @@ function radioselemts(obj, objradians, index) {
   var radianlabel = circlecoords(objradians, obj.off);
   graph.append("svg:g")
     .attr({
-      'id': 'elcircle_'+ index
+      'id': 'labelswrap_' + index
     });
 
-  graph.select('#elcircle_' + index).selectAll()
+  graph.select('#labelswrap_' + index).selectAll()
     .data(data)
     .enter() //----creates elements!!!
     .append("svg:text")
@@ -231,51 +258,11 @@ function radioselemts(obj, objradians, index) {
         .text(i + ' label ' + d);
 
     }); //---final labels
-}
 
-function donutmaker(objprop, index) {
-
-  //------object config
-  var objcfgcircle = {
-    'offorig': {
-      x: objprop.circle.sliders.posx * (canvasobj.posx / 100),
-      y: objprop.circle.sliders.posy * (canvasobj.posy / 100)
-    },
-    'arr': dataset,
-    'grades': objprop.circle.sliders.grades * (360 / 100),
-    'radio': objprop.circle.sliders.radio * ((canvasobj.posx / 2) / 100),
-    'rotation': objprop.circle.sliders.rotation * (180 / 100),
-    'strokew': objprop.circle.sliders.strokew,
-    'strokedata': objprop.circle.checkboxes.strokedata
-  };
-
-  var objcategory = {
-    'factor': objprop.category.sliders.rotation,
-    'rotation': objprop.category.checkboxes.rotate,
-    'off': objprop.category.sliders.off
-
-  };
+    //console.log('radianlabel[3]: ' + radianlabel[3]);
+}//-----radioelements
 
 
-  var data = dataset;
-  var systemid = coordsregister('circle', data);
-
-  var circle = document.createElementNS("http://www.w3.org/2000/svg", 'g');
-  document.getElementById('svg-wrap').appendChild(circle);
-  circle.setAttribute('id','arcswrap_' + index);
-
-  for (var itemdata in data) {
-    var i = parseInt(itemdata);
-    var radianlabel = circlecoords(objcfgcircle);
-
-    drawarcs(i, objcfgcircle, data[i], 'arcswrap_' + index);
-    //mostrar si se habilita conector!
-    todocoords[systemid].system.points.push({ 'x': radianlabel[0][i].cx, 'y': radianlabel[0][i].cy });
-  } //----for...
-
-  radioselemts(objcategory, objcfgcircle, index);
-
-} //---donutmaker
 /////////////////////////////////
 /// CONECTORS FUNCTIONS & GLOBALS
 /////////////////////////////////
@@ -291,8 +278,6 @@ function coordsregister(tipo, data) {
       points: []
     }
   });
-  ////console.log('coords registradas: ' + tipo);
-  ////console.log(JSON.stringify(todocoords));
 
   return (todocoords.length - 1);
 }
@@ -307,9 +292,9 @@ function pushcoords(systemid, x, y) {
 function palette(i) {
 
   //styling
-  var colors = ['#00BBD3', '#9B26AF', '#6639B6', '#3E50B4', '#2095F2', '#02A8F3', '#009587', '#4BAE4F', '#8AC249', '#CCDB38', '#FEEA3A', '#FEC006', '#FE9700', '#FE5621', '#F34235', '#E81D62', '#785447', '#9D9D9D', '#5F7C8A'];
+  var palettecols = ['#00BBD3', '#9B26AF', '#6639B6', '#3E50B4', '#2095F2', '#02A8F3', '#009587', '#4BAE4F', '#8AC249', '#CCDB38', '#FEEA3A', '#FEC006', '#FE9700', '#FE5621', '#F34235', '#E81D62', '#785447', '#9D9D9D', '#5F7C8A'];
 
-  return colors[i % colors.length];
+ 
 }
 
 function normalizevals(arr, grades) {
@@ -323,13 +308,11 @@ function normalizevals(arr, grades) {
   }
 
   for (i = 0; i < arr.length; i++) {
-
     localarr.push(((arr[i]) / total) * (grades));
-
   }
   return localarr;
 }
-
+ 
 function misumelemarr(arr, grades) {
   var losangles = normalizevals(arr, grades);
   var arrsum = [0];
@@ -362,4 +345,3 @@ function getMaxOfArray(arrr) {
 function getMinOfArray(arrr) {
   return Math.min.apply(null, arrr);
 }
-////////////console.log(JSON.stringify(coordsmiddle));
