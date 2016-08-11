@@ -1,2 +1,2 @@
 # pathvizator
-amazing svg graphics for data visualization
+amazing svg graphics creator for data visualization
