@@ -102,7 +102,7 @@ function drawarcs(i, objcfg, d, wrap, color, scalecol) {
 
 
 function donutmaker(objprop, index) {
-
+console.log(objprop.circle.sliders.grades * (360 / 100));
   //------object config
   var objcfgcircle = {
     'offorig': {
@@ -204,7 +204,8 @@ function circlecoords(objcfg, off) {
     coordscircle.push({ rx: rx, ry: ry, cx: cx, cy: cy });
 
   } //--- for
-  console.log('sum: ' + sumcenter);
+
+
   return [coordscircle, sum, onlyangles, sumcenter];
 } //------final coords
 

@@ -47,7 +47,7 @@ var setprops = [{
       sliders: {
         posx: 50,
         posy: 50,
-        grades: 100, //---ojo de 0-100
+        grades: 99.99999, //---ojo de 0-100
         radio: 50,
         rotation: 0,
         strokew: 15
@@ -228,6 +228,9 @@ function dropdownpanel() {
   - los valores de posicionamiento son relativos al canvas
 
   /////////// UI LIST
+
+  CORRECCIONES:
+  - ojo si se pone 0 como únio valor de data da error!
     
   MEJORAS UI:
     - mejorar los sliders, que se vea el valor
