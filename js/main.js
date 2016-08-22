@@ -20,6 +20,7 @@ function dibujargraphs(transformobj, numsystem) {
     donutmaker(transformobj[i].systemcircle, i);
   }
 
+  my_easy_ui();
 } //----dibujargraphs
 
 
@@ -88,12 +89,12 @@ function donutmaker(objprop, index) {
   //------object config
   var objcfgcircle = {
     'offorig': {
-      x: objprop.circle.sliders.posx * (canvasobj.posx / 100),
-      y: objprop.circle.sliders.posy * (canvasobj.posy / 100)
+      x: objprop.circle.sliders.posx * (canvasobj.width / 100),
+      y: objprop.circle.sliders.posy * (canvasobj.height / 100)
     },
     'arr': objprop.data,
     'grades': objprop.circle.sliders.grades * (360 / 100),
-    'radio': objprop.circle.sliders.radio * ((canvasobj.posx / 2) / 100),
+    'radio': objprop.circle.sliders.radio * ((canvasobj.width / 2) / 100),
     'rotation': objprop.circle.sliders.rotation * (180 / 100),
     'strokew': objprop.circle.sliders.strokew,
     'strokedata': objprop.circle.checkboxes.strokedata
@@ -196,8 +197,9 @@ function circlecoords(objcfg, off) {
 /////////////////////////////////
 
 var canvasobj = {
-  posx: $('#svg-wrap').outerWidth(),
-  posy: $('#svg-wrap').outerHeight()
+  width: $('#svg-wrap').outerWidth(),
+  height: $('#svg-wrap').outerHeight()
+
 };
 
 function radioselemts(obj, objradians, index, data) {
@@ -223,26 +225,36 @@ function radioselemts(obj, objradians, index, data) {
       var xcor = radianlabel[0][i].cx;
       var ycor = radianlabel[0][i].cy;
 
+      //---escribo texto
+      $this.text(i + ' label ' + d);
+
+      //---arreglar orientacion de los labels
+      var fixlabel;
+      if(xcor <= canvasobj.width / 2){
+        fixlabel=180;
+        $this.attr({'text-anchor':'end'});
+      }else{
+        fixlabel=0;
+      }
+
       todocoords[systemid].system.points.push({ 'x': radianlabel[0][i].cx, 'y': radianlabel[0][i].cy });
       var factcorr = 90;
 
       var transformation = '';
 
       if (obj.rotation) {
-        transformation = 'translate(' + (xcor) + ',' + ycor + ') rotate(' + (factcorr + (factcorr - ((radianlabel[3][i]) + factcorr))) + ')';
+        transformation = 'translate(' + (xcor) + ',' + ycor + ') rotate(' + ((factcorr + (factcorr - ((radianlabel[3][i]) + factcorr))) + fixlabel) + ')';
       } else {
         factcorr = obj.factor * (360 / 100);
-        transformation = 'translate(' + (xcor) + ',' + ycor + ') rotate(' + (factcorr + (factcorr - ((0) + factcorr))) + ')';
+        transformation = 'translate(' + (xcor) + ',' + ycor + ') rotate(' + ((factcorr + (factcorr - ((0) + factcorr))) + fixlabel) + ')';
       }
 
       $this.attr({
           'transform': transformation
-        })
-        .text(i + ' label ' + d);
+        });
 
     }); //---final labels
 
-    //console.log('radianlabel[3]: ' + radianlabel[3]);
 }//-----radioelements
 
 

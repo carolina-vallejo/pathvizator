@@ -1,5 +1,6 @@
 $(document).ready(function() {
 
+
   dropdownpanel(); //---crear listener para todos los droppanels
 
   $("#seltsystem").submit(function(event) {
@@ -29,17 +30,17 @@ $(document).ready(function() {
     event.preventDefault();
   });
 
+  //---initializate
+  setTimeout(function(){
+    $("#seltsystem input[type=submit]").trigger('click');
+  }, 500);
+    
+
 }); //----ready
 var numsystem;
 //---ojo crear otro objeto default para rects!
-var dataset2 = [1];
+var dataset2 = [1,1,1];
 
-//var dataset = [4.278098583, 2.352464008, 8.57979393, 4.717903532, 7.07036754, 4.2, 2.3333333333, 9.008321762, 126.5357450815, 87.87328, 11.3273771538, 5.4727604289, 0, 0, 100, 24.1827022451, 7.99360577730113, 137.5, 387.9047722729, 39.6724068363, 22.7407, 49.8385693954, 6.361541, 46.1956151252, 2.351122785, 4.71804376, 7.069166545, 153, 153 ,0.0046712205, 0.0046712205];
-
-var dataset = [10, 50, 100];
-
-
-//var dataset = [70, 20, 30, 40, 30, 30, 22, 12, 12, 12, 13, 15, 7, 23, 45, 22, 11, 11];
 
 var setprops = [{
   systemcircle: {
