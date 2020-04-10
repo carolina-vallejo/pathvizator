@@ -1,47 +1,147 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>pathvizator2</title>
 
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="js/jquery-ui.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/reset.css" />
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="icon" href="images/favicon.ico" />
-  </head>
-  <body>
-    <div class="lateral">
-      <div class="selectsystem">
-        <form id="seltsystem" action="">
-          <select name="" id="select">
-            <option value="uno">circle</option>
-          </select>
-          <input
-            class="input-circles"
-            type="text"
-            placeholder="How many circles do you want?"
-          />
-          <input type="submit" />
-        </form>
+<head>
+  <meta charset="UTF-8">
+  <title>SVG path data visualization</title>
+
+  <link rel="stylesheet" href="js/jquery-ui.min.css">
+  <link rel='stylesheet' href='js/spectrum.css' />
+
+  <link rel="stylesheet" href="fonts/style-fonts.css">
+  <link rel='stylesheet' href='js/prism.css' />
+  <link rel="stylesheet" href="css/styles.css">
+
+</head>
+
+<body>
+  <div class="lateral">
+    <div class="wrap-ui-system">
+    </div>
+  </div>
+
+  <div class="wrap1">
+    <!-- color picker -->
+    <input id='colorpicker' type="text" />
+
+    <!-- btns iconpaths wrap -->
+    <div class="btnswrap clear"></div>
+
+    <!-- lateral options-->
+
+    <!-- Chart container -->
+    <div class="graphwrapper clear">
+      <div class="row">
+
+        <!-- PLUS/MINUS BTNS -->
+        <div class="moreminus-circles">
+          <button id="more-circle" class="moreinput">+</button>
+          <button id="minus-circle" class="moreinput">-</button>
+        </div>
+
+
+        <!-- SVG CONTAINER -->
+
+        <div class="canvas" id="svgcontainer">
+          <svg id="svg-wrap" height="600"></svg>
+
+        </div>
+
       </div>
+      <!-- .row -->
+    </div>
+    <!-- .graphwrapper -->
 
-      <div class="wrap-ui-system"></div>
-      <div class="checkconectors">
-        <form id="selconnector" action="" style="display: none;">
-          <input type="submit" />
-        </form>
+    <div id="datainput" class="clear">
+      <div class="row">
+
+        <div class="headinputs clear">
+
+
+          <div class="inputtype clear">
+            <button id="sheets" class="btn">S!</button>
+            <button id="homeform" class="btn act">F!</button>
+          </div>
+          <div class="animatewrap clear">
+            <button id="animate-btn" class="btn">Animate</button>
+          </div>          
+          <div class="title"><span class="datainp">data input</span></div>
+
+          <div class="wrapbtngraph clear">
+            <button class="btncopycode" style="display:none"></button>
+
+            <button id="copycode" class="copycode" data-clipboard-target="#foo">copy code!</button>
+            <button id="graph">make a graph!</button>
+
+
+          </div>
+          <!-- .wrapbtns -->
+        </div>
+
+        <div id="inputtype-form">
+          <div id="catscontainer" class="inputs clear">
+            <div id="category1">
+              <div class="colorcat opencolor" style="background-color: #00BBD3"></div>
+              <input class="label" type="text" placeholder="category">
+              <input class="value" type="text" placeholder="value">
+            </div>
+          </div>
+
+          <div class="wrapbtns clear">
+            <button id="moreinput" class="moreinput">+</button>
+            <button id="minusinput" class="moreinput">-</button>
+          </div>
+          <!-- .wrapbtns -->
+        </div>
+        <div id="inputtype-sheets" style="display:none">
+          <a target="_blank" href="https://docs.google.com/spreadsheets/d/13YsPJFSmPXDE5PRr-d74vN78OHlrkJAfrwauzrIPmpk/edit#gid=0" class="go-sheets">open Sheets</a>
+        </div>
+
+      </div>
+      <!-- .row -->
+    </div>
+    <!-- .datainput -->
+
+    <div class="codeoutput"><pre><code id="svgcode" class="language-html"></code></pre>
+      <div class="outputs">
+        Code copied!
       </div>
     </div>
-    <div class="canvas">
-      <svg id="svg-wrap"></svg>
-    </div>
 
-    <script src="js/jquery-1.11.2.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
-    <script src="js/d3.js"></script>
-    <!-- <script src="https://d3js.org/d3.v5.js"></script> -->
-    <script src="js/interfaz.js"></script>
-    <script src="js/main.js"></script>
-  </body>
+  </div>
+
+
+  <!-- 
+
+STYLING
+@todo slider stroke
+@todo btns shapes 
+@todo color labels (spectrum color picker)
+
+DATA
+@input data
+@multiple data circles in circle
+
+
+
+-->
+
+  <script src="js/jquery-1.11.2.min.js"></script>
+  <script src="js/jquery-ui.min.js"></script>
+  <script src='js/spectrum.js'></script>
+  <script src='js/prism.js'></script>
+  <script src='js/vkbeautify.js'></script>
+  <script src="js/clipboard.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/d3.js"></script>
+  <script src="js/mousetrap.min.js"></script>
+  <script src="js/TweenMax.min.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/interfaz.js"></script>
+  <script src="js/circles.js"></script>
+  <script src="js/my-easy-ui.js"></script>
+
+
+</body>
+
 </html>

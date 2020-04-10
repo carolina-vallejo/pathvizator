@@ -1,41 +1,211 @@
 $(document).ready(function () {
+  //__INITIALIZATION
   dropdownpanel(); //---crear listener para todos los droppanels
+  initcircles(1);
+  btnsiconpaths(1); //---draw iconpaths---
+  $("#btnpath1").addClass("act");
+  $("#systemcircle_0").addClass("act");
+  $("#arcswrap_" + 0).attr("class", "arc act");
 
-  $("#seltsystem").submit(function (event) {
+  //---more circles
+  $("#more-circle").on("click", function () {
     $(".wrap-ui-system").empty(); //---ojo mirar para cuando hayan rects
 
-    numsystem = $.isNumeric($('input[type="text"]').val())
-      ? parseInt($('input[type="text"]').val())
-      : 1;
-    if (numsystem === 0) {
-      numsystem = 1;
+    //--maximo de circulos permitido
+    numsystem += 1;
+
+    if (numsystem > num_maxcircles) {
+      numsystem = num_maxcircles;
+    } else {
+      btnsiconpaths(numsystem);
+    }
+    initcircles(numsystem);
+
+    init_ui_act(numsystem - 1);
+  }); ///---mas circles
+  //---less circles
+  $("#minus-circle").on("click", function () {
+    $(".wrap-ui-system").empty(); //---ojo mirar para cuando hayan rects
+
+    //--minimo de circulos permitido
+    numsystem = numsystem < 2 ? 1 : (numsystem -= 1);
+    initcircles(numsystem);
+    $("#btnpath" + (numsystem + 1)).remove();
+
+    init_ui_act(numsystem - 1);
+  }); //---minus
+
+  //---make a graph
+  $("#graph").on("click", function () {
+    $("html body").animate({ scrollTop: 0 }, 600);
+
+    if ($(".inputtype .act").attr("id") === "sheets") {
+      dividedata(thesheetsdata, actsistema);
+    } else {
+      dividedata(getformdata(), actsistema);
     }
 
-    for (var i = 0; i < numsystem; i++) {
-      //----crear todos los systemas
-
-      if (i < numsystem - 1) {
-        var clonecirclesys = JSON.parse(JSON.stringify(setprops[0]));
-        setprops.push(clonecirclesys);
-      }
-      setprops[i].systemcircle.circle.sliders.radio = i * 8 + 30;
-      setprops[i].systemcircle.category.sliders.off = (numsystem - i) * 30;
-      circle_system_ui(i);
-    }
-
-    dibujargraphs(setprops, numsystem);
-
-    event.preventDefault();
+    //
   });
 
-  //---initializate
-  setTimeout(function () {
-    $("#seltsystem input[type=submit]").trigger("click");
-  }, 500);
+  //----SHEETS FORM / EASY FORM
+  $(".inputtype").on("click", "button", function () {
+    var $this = $(this);
+    $this.parent().children().removeClass("act");
+    $this.addClass("act");
+
+    if ($this.attr("id") === "sheets") {
+      $("#inputtype-form").hide();
+      $("#inputtype-sheets").show();
+      console.log($this);
+    } else {
+      $("#inputtype-form").show();
+      $("#inputtype-sheets").hide();
+    }
+  });
+
+  enterdetector(0);
 }); //----ready
-var numsystem;
+
+function getformdata() {
+  var $elemt = $("#catscontainer");
+  var theobject = new Object();
+  theobject.id = 0;
+  theobject.type = "type1";
+  theobject.data = [];
+
+  $elemt.children("div").each(function (i) {
+    theobject.data[i] = {
+      color: $(this).find(".colorcat").css("background-color"),
+      category: $(this).find(".label").val(),
+      value: $.isNumeric($(this).find(".value").val())
+        ? parseInt($(this).find(".value").val())
+        : 0,
+    };
+  });
+  // console.log('getdata'+JSON.stringify(theobject));
+  return theobject;
+}
+//-----SPLIT DATA
+function dividedata(obj, count) {
+  var datavalue = [];
+  var datacateg = [];
+  var datacolor = [];
+  for (var item in obj.data) {
+    datavalue.push(obj.data[item].value);
+    datacateg.push(obj.data[item].category);
+    datacolor.push(obj.data[item].color);
+  }
+  //--si no hay ningun data se inicializa a 1
+  if (datavalue.length === 1) {
+    if (datavalue[0] === 0) {
+      datavalue[0] = 1;
+    }
+  }
+  setprops[count].systemcircle.data = datavalue;
+  setprops[count].systemcircle.textcateg = datacateg;
+  setprops[count].systemcircle.color = datacolor;
+
+  dibujargraphs(setprops, numsystem);
+}
+
+function getgooglesheets() {
+  $("#graph").hide();
+
+  // ID of the Google Spreadsheet
+  var spreadsheetID = "13YsPJFSmPXDE5PRr-d74vN78OHlrkJAfrwauzrIPmpk";
+
+  var url =
+    "https://spreadsheets.google.com/feeds/list/" +
+    spreadsheetID +
+    "/od6/public/values?alt=json";
+
+  $.getJSON(url, function (data) {
+    var entry = data.feed.entry;
+
+    var theobject = new Object();
+    theobject.id = 0;
+    theobject.type = "type1";
+    theobject.data = [];
+
+    //--color management
+
+    var arrdata = [];
+
+    $(entry).each(function (i) {
+      theobject.data[i] = {
+        color: "gray",
+        category: this.gsx$label1.$t,
+        value: parseInt(this.gsx$value1.$t),
+      };
+      arrdata.push(parseInt(this.gsx$value1.$t));
+    });
+
+    // console.log(arrdata);
+    // console.log('MAX: ' + getMaxOfArray(arrdata));
+    // console.log('MIN: ' + getMinOfArray(arrdata));
+    // console.log('length: ' + arrdata.length);
+
+    var maxval = getMaxOfArray(arrdata);
+    var minval = getMinOfArray(arrdata);
+    var rangepaleta = 7;
+
+    for (var val in arrdata) {
+      var num = arrdata[val];
+
+      //--- PALETE COLOR RANGE
+      theobject.data[val].color =
+        paleta[Math.round(num.map(minval, maxval, 1, 7))];
+      var percent = Math.round(num.map(minval, maxval, 1, 100));
+      //--MONO COLOR
+      //theobject.data[val].color = 'hsl(200, 80%, '+Math.round(num.map(minval, maxval, 100, 1))+'%)';
+    }
+
+    thesheetsdata = theobject;
+    $("#graph").show();
+  });
+}
+getgooglesheets();
+var thesheetsdata;
+
+function enterdetector(num) {
+  var valueinput = $(".value").get(num);
+  Mousetrap(valueinput).bind("enter", function (e, combo) {
+    $("#graph").trigger("click");
+  });
+}
+
+function initcircles(numsystem) {
+  for (var i = 0; i < numsystem; i++) {
+    //----crear todos los systemas
+
+    if (i < numsystem - 1) {
+      var clonecirclesys = JSON.parse(JSON.stringify(setprops[0]));
+      setprops.push(clonecirclesys);
+    }
+    setprops[i].systemcircle.circle.sliders.radio = i * 8 + 30;
+    //setprops[i].systemcircle.category.sliders.off = (numsystem - i) * 30;
+    circle_system_ui(i);
+
+    //console.log('numsystem: ' + numsystem +' i '+ i);
+
+    if (numsystem - 1 === i) {
+      //para un nuevo circulo VACIAR DATA / CATEG / COLOR;
+      setprops[i].systemcircle.data = [1];
+      setprops[i].systemcircle.textcateg = [""];
+      setprops[i].systemcircle.color = ["rgb(0, 187, 211)"];
+    }
+  }
+
+  dibujargraphs(setprops, numsystem);
+}
+
+var numsystem = 1;
+var num_maxcircles = 10;
 //---ojo crear otro objeto default para rects!
-var dataset2 = [1, 1, 1];
+var dataset = [1];
+var datacateg = ["1"];
+var datacolor = ["rgb(0, 187, 211)"];
 
 var setprops = [
   {
@@ -56,7 +226,8 @@ var setprops = [
       category: {
         sliders: {
           rotation: 100,
-          off: 30,
+          off: 60,
+          fontsize: 25,
         },
         checkboxes: {
           rotate: true,
@@ -64,33 +235,12 @@ var setprops = [
           hide: true,
         },
       },
-      data: dataset2,
+      data: dataset,
+      textcateg: datacateg,
+      color: datacolor,
     },
   },
 ];
-
-function datamaker(count) {
-  function htmlinput() {
-    var htmlcheckbox = '<input type="text" placeholder="e.g. 10, 100, 200">';
-
-    return htmlcheckbox;
-  }
-
-  var $parent = $("#systemcircle_" + count);
-
-  $parent.append(htmlinput());
-
-  $parent.find("input[type='text']").change(function () {
-    var dataraw = $(this).val();
-    var dataarr = dataraw.split(",");
-    for (var item in dataarr) {
-      dataarr[item] = $.isNumeric(dataarr[item]) ? parseInt(dataarr[item]) : 0;
-    }
-
-    setprops[count].systemcircle.data = dataarr;
-    dibujargraphs(setprops, numsystem);
-  });
-} //------slidermaker
 
 function slidermaker(obj, elm, count) {
   var num = Object.keys(obj.sliders).length;
@@ -131,7 +281,7 @@ function slidermaker(obj, elm, count) {
       min: 1,
       max: 100,
       value: obj.sliders[propsnames[i - 1]],
-      change: function (value) {
+      change: function () {
         var idstr = $(this).attr("id");
         var $labelValue = $parent.find("#label-value-" + idstr);
         $labelValue.text($(this).slider("value"));
@@ -141,7 +291,6 @@ function slidermaker(obj, elm, count) {
   }
 
   function inchangeslider($elm) {
-    console.log($elm);
     var idstr = $elm.attr("id");
     idstr = idstr.replace(elm, "");
 
@@ -203,7 +352,7 @@ function checkboxmaker(obj, elm, count) {
 
 function category_ui(wrap, count) {
   $(".wrap-ui-system " + wrap).append(
-    '<div class="category"><h2>Categories Values</h2><div class="uiwrap"></div></div>'
+    '<div class="category"><h2>Categories</h2><div class="uiwrap"></div></div>'
   );
   slidermaker(setprops[count].systemcircle.category, "category", count);
   checkboxmaker(setprops[count].systemcircle.category, "category", count);
@@ -220,8 +369,6 @@ function circle_system_ui(count) {
   slidermaker(setprops[count].systemcircle.circle, "circle", count);
   checkboxmaker(setprops[count].systemcircle.circle, "circle", count);
   category_ui("#systemcircle_" + count, count);
-
-  datamaker(count);
 }
 
 function dropdownpanel() {

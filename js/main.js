@@ -1,376 +1,271 @@
-function dibujargraphs(transformobj, numsystem) {
-  /*---------------------------------------------------------------
-    CANVAS
-  ----------------------------------------------------------------*/
-  //clean canvas
-  $("#svg-wrap").empty();
+$(document).ready(function() {
 
-  //create back wrap content
-  var backwrap = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  backwrap.setAttribute("id", "backwrap");
-  document.getElementById("svg-wrap").appendChild(backwrap);
 
-  //clean coords
-  todocoords = [];
 
-  //---loop donut maker
-  for (var i = 0; i < numsystem; i++) {
-    donutmaker(transformobj[i].systemcircle, i);
-  }
-} //----dibujargraphs
+  $("#colorpicker").spectrum({
+    color: "#E91C60",
+    showInput: true,
+    className: "full-spectrum",
+    showInitial: true,
+    showPalette: true,
+    hideAfterPaletteSelect: true,
+    showSelectionPalette: true,
+    maxSelectionSize: 6,
+    preferredFormat: "hex",
+    localStorageKey: "spectrum.demo",
+    palette: [paleta]
+  });
 
-function drawsystemconnector(id1, id2, data) {
-  //---create wraps-OJO HACER UNO POR CADA SYSTEMA
-  var connectwrap = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  connectwrap.setAttribute("id", "connectwrap");
-  document.getElementById("svg-wrap").appendChild(connectwrap);
+  var coloract, colorelemt;
 
-  for (var itemdata in data) {
-    drawconector(
-      todocoords[id1].system.points[itemdata].x,
-      todocoords[id1].system.points[itemdata].y,
-      todocoords[id2].system.points[itemdata].x,
-      todocoords[id2].system.points[itemdata].y
-    );
-  }
-}
+  $("#colorpicker").change(function() {
+    coloract = $(this).val();
+    changecolorcat(coloract, colorelemt);
 
-function drawconector(x1, y1, x2, y2) {
-  var aconnector = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "path"
-  );
-  document.getElementById("connectwrap").appendChild(aconnector);
-  aconnector.setAttribute("d", "M" + x1 + " " + y1 + " L" + x2 + " " + y2);
+  });
 
-  aconnector.setAttribute("stroke", "black");
-  aconnector.setAttribute("stroke-width", 0.5);
-  aconnector.setAttribute("fill", "none");
-} //--- drawconnector
+  ////////////////////
+  /// INTERFACE ///
+  ////////////////////
 
-var offx = 0;
-var offy = 0;
-var palettecols = [
-  "#00BBD3",
-  "#9B26AF",
-  "#6639B6",
-  "#3E50B4",
-  "#2095F2",
-  "#02A8F3",
-  "#009587",
-  "#4BAE4F",
-  "#8AC249",
-  "#CCDB38",
-  "#FEEA3A",
-  "#FEC006",
-  "#FE9700",
-  "#FE5621",
-  "#F34235",
-  "#E81D62",
-  "#785447",
-  "#9D9D9D",
-  "#5F7C8A",
-];
+  /*
+   * copy code! 
+   */
 
-function drawarcs(i, objcfg, d, wrap, color, scalecol) {
-  var raddata = circlecoords(objcfg);
+  $('#copycode').on('click', function() {
 
-  var angles = raddata[2];
+    //indent code
+    var svgcode = vkbeautify.xml($('#svgcontainer').html());
 
-  var svgns = "http://www.w3.org/2000/svg";
-
-  var aPath3 = document.createElementNS(svgns, "path");
-  document.getElementById(wrap).appendChild(aPath3);
-
-  aPath3.setAttribute(
-    "d",
-    " M" +
-      raddata[0][i].rx +
-      "," +
-      raddata[0][i].ry +
-      " A" +
-      "-" +
-      objcfg.radio +
-      " " +
-      objcfg.radio +
-      " 0 " +
-      (angles[i] < 180 ? 0 : 1) +
-      " 0 " +
-      raddata[0][i + 1].rx +
-      " " +
-      raddata[0][i + 1].ry
-  );
-
-  aPath3.setAttribute("stroke", palettecols[i % palettecols.length]);
-
-  if (!objcfg.strokedata) {
-    aPath3.setAttribute("stroke-width", objcfg.strokew);
-  } else {
-    aPath3.setAttribute("stroke-width", objcfg.strokew * (d / 50));
-  }
-
-  aPath3.setAttribute("fill", "none");
-} //---drawarcs
-
-function donutmaker(objprop, index) {
-  //------object config
-  var objcfgcircle = {
-    offorig: {
-      x: objprop.circle.sliders.posx * (canvasobj.width / 100),
-      y: objprop.circle.sliders.posy * (canvasobj.height / 100),
-    },
-    arr: objprop.data,
-    grades: objprop.circle.sliders.grades * (360 / 100),
-    radio: objprop.circle.sliders.radio * (canvasobj.width / 2 / 100),
-    rotation: objprop.circle.sliders.rotation * (180 / 100),
-    strokew: objprop.circle.sliders.strokew,
-    strokedata: objprop.circle.checkboxes.strokedata,
-  };
-
-  var objcategory = {
-    factor: objprop.category.sliders.rotation,
-    rotation: objprop.category.checkboxes.rotate,
-    off: objprop.category.sliders.off,
-    hide: objprop.category.checkboxes.hide,
-    connect: objprop.category.checkboxes.connect,
-  };
-
-  var data = objcfgcircle.arr;
-  var systemid = coordsregister("circle", data);
-
-  var circle = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  document.getElementById("backwrap").appendChild(circle);
-  circle.setAttribute("id", "arcswrap_" + index);
-
-  //---scalecolor
-
-  var scalecol = d3.scale
-    .linear()
-    .domain([
-      getMinOfArray(objprop.data),
-      getMaxOfArray(objprop.data) / 1.4,
-      getMaxOfArray(objprop.data),
-    ])
-    .range([-1, 0, 1]);
-
-  var color = d3.scale
-    .linear()
-    .domain([-1, 0, 1])
-    .range(["rgb(200, 200, 200)", "rgb(80,80,80)", "rgb(60,60,60)"]);
-
-  for (var itemdata in data) {
-    var i = parseInt(itemdata);
-    var radianlabel = circlecoords(objcfgcircle);
-
-    drawarcs(i, objcfgcircle, data[i], "arcswrap_" + index, color, scalecol);
-    //mostrar si se habilita conector!
-    todocoords[systemid].system.points.push({
-      x: radianlabel[0][i].cx,
-      y: radianlabel[0][i].cy,
+    //instanciate clipboardjs
+    var clipboard = new Clipboard('.btncopycode', {
+      text: function(trigger) {
+        return svgcode;
+      }
     });
-  } //----for...
+    $('.btncopycode').trigger('click');
 
-  if (objcategory.hide) {
-    radioselemts(objcategory, objcfgcircle, index, data);
-    if (objcategory.connect) {
-      drawsystemconnector(systemid, systemid + 1, data);
-    }
-  }
-} //---donutmaker
+    // replace '<' '>' '&'
+    var svgencode = encodeXmlEntities(svgcode);
+    // append code
+    $('#svgcode').css('opacity', 0).empty().append(svgencode);
 
-function circlecoords(objcfg, off) {
-  var off = typeof off !== "undefined" ? off : 0;
+    // styling code!
+    Prism.highlightElement(document.getElementById('svgcode'), false, function() {});
 
-  ///---fuera
-  var offorig = objcfg.offorig;
-  var arr = objcfg.arr;
-  var grades = objcfg.grades;
-  var radio = objcfg.radio + off;
-  var rotation = objcfg.rotation;
+    //move scroll to bottom!
+    var codescroll = $('.codeoutput').offset();
 
-  ///--locals
-  var coordscircle = [];
+    $('html body').animate({ scrollTop: (codescroll.top - 50) }, 600, function() {
+      $('#svgcode').animate({ opacity: 1 }, 600, 'easeOutQuad');
+      //$('.outputs').animate({ opacity: 1 }, 600, 'easeOutQuad');
+    });
 
-  var getsum = misumelemarr(arr, grades);
-  var sum = getsum[0];
-  var onlyangles = getsum[1];
-  var sumcenter = [];
+    $('.outputs').css('opacity', 1);
+    setTimeout(function() {
+      $('.outputs').css('opacity', 0);
+    }, 1000);
 
-  //for (var i = sum.length - 1; i >= 0; i--) {
-  for (var i = 0; i < sum.length; i++) {
-    sum[i] = sum[i] + rotation;
+  }); //---->final copycode event
 
-    var rx = Math.sin(Math.radians(sum[i])) * radio + offorig.x;
-    var ry = Math.cos(Math.radians(sum[i])) * radio + offorig.y;
+  ////////////////////
+  /// DATA INPUTS ///
+  ////////////////////
 
-    var lasum;
-    if (i + 1 < sum.length) {
-      lasum = sum[i + 1] + rotation;
-    } else {
-      lasum = sum[0];
-    }
-    sumcenter.push(sum[i] + (lasum - sum[i]) / 2);
-    var add = 10;
-    var cx =
-      Math.sin(Math.radians(sum[i] + (lasum - sum[i]) / 2)) * radio + offorig.x;
-    var cy =
-      Math.cos(Math.radians(sum[i] + (lasum - sum[i]) / 2)) * radio + offorig.y;
-
-    coordscircle.push({ rx: rx, ry: ry, cx: cx, cy: cy });
-  } //--- for
-
-  return [coordscircle, sum, onlyangles, sumcenter];
-} //------final coords
-
-/////////////////////////////////
-/// SYSTEM FUNCTIONS & GLOBALS
-/////////////////////////////////
-
-var canvasobj = {
-  width: $("#svg-wrap").outerWidth(),
-  height: $("#svg-wrap").outerHeight(),
-};
-
-function radioselemts(obj, objradians, index, data) {
-  var graph = d3.select("#svg-wrap");
-
-  var systemid = coordsregister("radio", data);
-
-  // si se ha habilitado los labels para un sistema especifico,
-  // en este caso cojemos los datos de circle
-  var radianlabel = circlecoords(objradians, obj.off);
-  graph.append("svg:g").attr({
-    id: "labelswrap_" + index,
+  /*
+   * color picker
+   */
+  $('#category' + 1).on('click', '.opencolor', function(e) {
+    colorelemt = $(this);
+    $("#colorpicker").spectrum("toggle");
+    return false;
   });
 
-  graph
-    .select("#labelswrap_" + index)
-    .selectAll()
-    .data(data)
-    .enter() //----creates elements!!!
-    .append("svg:text")
-    .each(function (d, i) {
-      var $this = $(this);
-      var xcor = radianlabel[0][i].cx;
-      var ycor = radianlabel[0][i].cy;
+  /*
+   * more btn
+   */
+  var counter = 1;
+  $('#moreinput').on('click.morebtn', function() {
+    counter++;
 
-      //---escribo texto
-      $this.text(d);
+    var catinput = $('#category1').html();
 
-      //---arreglar orientacion de los labels
-      var fixlabel;
-      if (xcor <= canvasobj.width / 2) {
-        fixlabel = 180;
-        $this.attr({ "text-anchor": "end" });
-      } else {
-        fixlabel = 0;
-      }
+    $('.inputs').append('<div id="category' + counter + '">' + catinput + '</div>');
+    $('#category' + counter).find('.colorcat').css('background-color', paleta[counter]);
 
-      todocoords[systemid].system.points.push({
-        x: radianlabel[0][i].cx,
-        y: radianlabel[0][i].cy,
-      });
-      var factcorr = 90;
+    $('#category' + counter).on('click', '.opencolor', function() {
+      colorelemt = $(this);
+      $("#colorpicker").spectrum("toggle");
+      return false;
+    });
 
-      var transformation = "";
+      enterdetector(counter-1);
 
-      if (obj.rotation) {
-        transformation =
-          "translate(" +
-          xcor +
-          "," +
-          ycor +
-          ") rotate(" +
-          (factcorr + (factcorr - (radianlabel[3][i] + factcorr)) + fixlabel) +
-          ")";
-      } else {
-        factcorr = obj.factor * (360 / 100);
-        transformation =
-          "translate(" +
-          xcor +
-          "," +
-          ycor +
-          ") rotate(" +
-          (factcorr + (factcorr - (0 + factcorr)) + fixlabel) +
-          ")";
-      }
-
-      $this.attr({
-        transform: transformation,
-      });
-    }); //---final labels
-} //-----radioelements
-
-/////////////////////////////////
-/// CONECTORS FUNCTIONS & GLOBALS
-/////////////////////////////////
-//almaceno coords para las líneas
-var todocoords = [];
-
-function coordsregister(tipo, data) {
-  todocoords.push({
-    system: {
-      tipo: tipo,
-      data: data,
-      points: [],
-    },
   });
 
-  return todocoords.length - 1;
-}
+  /*
+   * minus btn
+   */
+  $('#minusinput').on('click', function() {
+    var $lastdiv = $('.inputs').children('div:last-child');
 
-function pushcoords(systemid, x, y) {
-  todocoords[systemid].system.points.push({ x: parseInt(x), y: parseInt(y) });
-}
+    if ($lastdiv.attr('id') !== 'category1') {
 
-///////////////////////////
-/// Auxiliary functions ///
-///////////////////////////
-
-function normalizevals(arr, grades) {
-  var total = 0;
-  var totalnorm = 0;
-  var localarr = [];
-
-  for (var i = 0; i < arr.length; i++) {
-    total += arr[i];
-  }
-
-  for (i = 0; i < arr.length; i++) {
-    localarr.push((arr[i] / total) * grades);
-  }
-  return localarr;
-}
-
-function misumelemarr(arr, grades) {
-  var losangles = normalizevals(arr, grades);
-  var arrsum = [0];
-  var total = 0;
-
-  for (var i = 0; i < losangles.length; i++) {
-    total += losangles[i];
-
-    if (i !== 0) {
-      arrsum[i + 1] = total;
-    } else {
-      arrsum[i + 1] = losangles[i];
+      $lastdiv.off('click');
+      $lastdiv.remove();
     }
-  }
-  return [arrsum, losangles];
-}
+  });
 
-Math.radians = function (degrees) {
-  return (degrees * Math.PI) / 180;
+
+
+  /*
+   * btns iconpaths!
+   */
+
+
+  //---EVENTS
+  $(window).scroll(function() {
+    //console.log($( window ).scrollTop());
+  });
+
+}); //--- *ready
+
+//---color picker!
+var paleta = ['#00BBD3', '#9B26AF', '#6639B6', '#3E50B4', '#2095F2', '#02A8F3', '#009587', '#4BAE4F', '#8AC249', '#CCDB38', '#FEEA3A', '#FEC006', '#FE9700', '#FE5621', '#F34235', '#E81D62', '#785447', '#9D9D9D', '#5F7C8A'];
+var mypaths = {
+  circle: "M45,120a75,75 0 1,0 150,0a75,75 0 1,0 -150,0",
+  line: "M 0 120 L 200 120",
+  triangle: "M92.401,190c-41.454,0-58.413-29.371-37.685-65.273l27.598-47.8  c20.728-35.902,54.645-35.902,75.372,0l27.6,47.8C206.012,160.626,189.054,190,147.599,190H92.401z",
+  infinite: "M35.614,121c0,81,168.771-84,168.771,0 C204.386,202,35.614,37,35.614,121z",
+  trebol: "M120,120C120-37.355,277.355,120,120,120 C-37.357,120,120-37.355,120,120C120,277.357-37.357,120,120,120 C277.355,120,120,277.357,120,120z",
+  curve: "M34.313,109.723c22.626-3.43,26.835,10.622,45.134,18.138 c13.849,5.688,31.384,2.034,45.438-1.717c19.042-5.083,34.272-15.123,54.508-9.093c9.48,2.825,16.451,10.84,26.294,11.375",
+  spiral: "M173.34,34.29c40.607,40.608,40.607,106.446,0,147.055  c-32.486,32.486-85.157,32.486-117.644,0c-25.989-25.989-25.989-68.126,0-94.115c20.791-20.791,54.501-20.791,75.292,0  c16.633,16.634,16.633,43.601,0,60.233c-13.307,13.307-34.88,13.307-48.187,0c-10.645-10.645-10.645-27.904,0-38.549  c8.516-8.517,22.324-8.517,30.839,0c6.813,6.812,6.813,17.858,0,24.671c-5.45,5.451-14.287,5.451-19.737,0"
 };
+//--iniciar UI circle ACT
+function init_ui_act(index){
 
-function rand() {
-  return Math.floor(Math.random() * 100 + 1);
+  actsistema=index;
+
+  //---limpiar ACT
+  $('.grapbtn').removeClass('act');
+  $('.thesys').removeClass('act');
+  $('.arc').attr('class','arc');
+  
+  //---marcar ACT    
+  $('#btnpath' + (index + 1)).addClass('act');
+  $('#systemcircle_'+ index).addClass('act');
+  $('#arcswrap_' + index).attr('class','arc act');
+
+ //console.log(JSON.stringify(setprops[index].systemcircle.data));
+ 
+ $('#catscontainer').children().each(function(i){
+  $(this).find('.value').val(setprops[index].systemcircle.data[i]);
+ });
+
+}//----init_ui_act
+
+var actsistema=0;
+function encodeXmlEntities(str) {
+  return str.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+var svgns = "http://www.w3.org/2000/svg";
+
+
+
+//------color change
+function changecolorcat(coloract, elemt) {
+
+  $(elemt).css('background-color', coloract);
+  $(elemt).attr('data-color', coloract);
+
+}
+//----- INSERTAR SVG EN LOS BOTONES
+function drawiconpath(id, path) {
+
+  var svgcontext = document.getElementById('path' + id);
+  svgcontext.setAttribute('viewBox', '25 25 190 190');
+
+  var iconpath = document.createElementNS(svgns, 'path');
+  //--path circle
+  iconpath.setAttribute('d', path);
+  iconpath.style.strokeWidth = 20;
+  iconpath.style.stroke = '#2A2B30';
+  iconpath.style.fillOpacity = 0;
+
+  svgcontext.appendChild(iconpath);
+
+}
+//---INIT BTNS SUPERIORES
+
+function btnsiconpaths(num) {
+
+  var iconpathbtn = '<button id="btnpath' + num + '" class="grapbtn"><svg id="path' + num + '"></svg></button>';
+    $('.btnswrap').append(iconpathbtn);
+    drawiconpath(num, mypaths.circle);
+
+    // listeners
+    $('#btnpath' + num).on('click', function() {
+      init_ui_act($(this).index() - 1);
+    });  
 }
 
-function getMaxOfArray(arrr) {
-  return Math.max.apply(null, arrr);
-}
+function btn_viz_all() {
+  var num='all';
+  var iconpathbtn = '<button id="btnpathx" class="grapbtn"><svg id="path' + num + '"></svg></button>';
+    $('.btnswrap').prepend(iconpathbtn);
+    drawiconpath(num, mypaths.spiral);
+   
 
-function getMinOfArray(arrr) {
-  return Math.min.apply(null, arrr);
+    // listeners
+    $('#btnpathx').on('click', function() {
+      
+      $('.arc').attr('class','arc show');
+      $('.grapbtn').removeClass('act').addClass('show');
+      $(this).addClass('act');
+    });  
 }
+btn_viz_all();
+//---DATAS VAR
+
+
+/*
+
+UI/UX COMMENTS
+
+- hacer scroll cuando se creen mas categorias y scroll+animation cuando se genere la viz
+- cuando metas un valor que no es numero animar para quitarlo y hacer un llamado
+- menu izquiero para cambiar stroke width /  y que tal morfismo shape?
+- esquina con logo de github
+- esquna der con las shapes por defector para la donut, pensar como podría ser para las demas grñaficas, talvez icono de tipologías.
+
+- Pensar en radar! y en otras cosas raras...!!! piensa en colors feels, como se haria eso?
+valores de varias coordenadas, como tiempo/lugar/valor----
+
+- si son muchas las leyendas ponerlas por columnas
+
+- pensar en el icono del < code > que se va a generar y en su diseño!
+
+- al lado del boton de crear grafico, poner copiar codigo, esto abre un lightbox con el codigo a copiar, ojo inluir animaciones!
+
+- el color picker al abrirse debería mostrar el color el click element
+
+- reset button!
+
+- que al hacer enter se oprima el " make a graph! "
+
+- hacer btn de subir pa arriba del todo
+
+- que al hacer copi code se redibuje todo y se genere de nuevo el code!
+
+PARA PROMO:
+- hacer video con el funcionamiento, youtube, y rodarlo en twitter!.
+- o explicar con tooltips, maybe...
+- que quede claro que se puede cambiar el color
+
+
+UTILITIES!!!
+- ojo autogenerar el data porque es un coñazo!
+
+*/
