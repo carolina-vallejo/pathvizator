@@ -1,2 +1,5 @@
 # pathvizator
-amazing svg graphics creator for data visualization
+
+Is an experimemtal UI to draw nested donuts charts
+
+![alt text](images/pathvizator.png "example")
