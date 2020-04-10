@@ -95,6 +95,12 @@ svg {
   display: block;
   float: left;
 }
+
+.label span {
+  display: inline-block;
+  margin-left: 3px;
+  font-weight: bold;
+}
 /*----TOGGLE------*/
 
 .tooglebox {
@@ -141,4 +147,9 @@ svg {
 .thesys {
   border-bottom: 1px solid white;
   padding-bottom: 15px;
+}
+
+.input-circles {
+  display: block;
+  width: 100%;
 }

@@ -50,6 +50,27 @@ function drawconector(x1, y1, x2, y2) {
 
 var offx = 0;
 var offy = 0;
+var palettecols = [
+  "#00BBD3",
+  "#9B26AF",
+  "#6639B6",
+  "#3E50B4",
+  "#2095F2",
+  "#02A8F3",
+  "#009587",
+  "#4BAE4F",
+  "#8AC249",
+  "#CCDB38",
+  "#FEEA3A",
+  "#FEC006",
+  "#FE9700",
+  "#FE5621",
+  "#F34235",
+  "#E81D62",
+  "#785447",
+  "#9D9D9D",
+  "#5F7C8A",
+];
 
 function drawarcs(i, objcfg, d, wrap, color, scalecol) {
   var raddata = circlecoords(objcfg);
@@ -80,7 +101,7 @@ function drawarcs(i, objcfg, d, wrap, color, scalecol) {
       raddata[0][i + 1].ry
   );
 
-  aPath3.setAttribute("stroke", color(scalecol(objcfg.arr[i])));
+  aPath3.setAttribute("stroke", palettecols[i % palettecols.length]);
 
   if (!objcfg.strokedata) {
     aPath3.setAttribute("stroke-width", objcfg.strokew);
@@ -234,7 +255,7 @@ function radioselemts(obj, objradians, index, data) {
       var ycor = radianlabel[0][i].cy;
 
       //---escribo texto
-      $this.text(i + " label " + d);
+      $this.text(d);
 
       //---arreglar orientacion de los labels
       var fixlabel;
@@ -305,30 +326,6 @@ function pushcoords(systemid, x, y) {
 ///////////////////////////
 /// Auxiliary functions ///
 ///////////////////////////
-function palette(i) {
-  //styling
-  var palettecols = [
-    "#00BBD3",
-    "#9B26AF",
-    "#6639B6",
-    "#3E50B4",
-    "#2095F2",
-    "#02A8F3",
-    "#009587",
-    "#4BAE4F",
-    "#8AC249",
-    "#CCDB38",
-    "#FEEA3A",
-    "#FEC006",
-    "#FE9700",
-    "#FE5621",
-    "#F34235",
-    "#E81D62",
-    "#785447",
-    "#9D9D9D",
-    "#5F7C8A",
-  ];
-}
 
 function normalizevals(arr, grades) {
   var total = 0;

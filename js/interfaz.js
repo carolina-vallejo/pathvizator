@@ -108,6 +108,10 @@ function slidermaker(obj, elm, count) {
       '<div class="label">' +
       elm +
       propsnames[id - 1] +
+      "<span id='label-value-" +
+      elm +
+      propsnames[id - 1] +
+      "'></span>" +
       "</div>" +
       '<div id="' +
       elm +
@@ -127,13 +131,17 @@ function slidermaker(obj, elm, count) {
       min: 1,
       max: 100,
       value: obj.sliders[propsnames[i - 1]],
-      change: function () {
+      change: function (value) {
+        var idstr = $(this).attr("id");
+        var $labelValue = $parent.find("#label-value-" + idstr);
+        $labelValue.text($(this).slider("value"));
         inchangeslider($(this));
       },
     });
   }
 
   function inchangeslider($elm) {
+    console.log($elm);
     var idstr = $elm.attr("id");
     idstr = idstr.replace(elm, "");
 
@@ -195,7 +203,7 @@ function checkboxmaker(obj, elm, count) {
 
 function category_ui(wrap, count) {
   $(".wrap-ui-system " + wrap).append(
-    '<div class="category"><h2>Categories</h2><div class="uiwrap"></div></div>'
+    '<div class="category"><h2>Categories Values</h2><div class="uiwrap"></div></div>'
   );
   slidermaker(setprops[count].systemcircle.category, "category", count);
   checkboxmaker(setprops[count].systemcircle.category, "category", count);
