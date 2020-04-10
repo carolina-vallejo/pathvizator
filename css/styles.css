@@ -1,63 +1,62 @@
 @import url(fonts/style-fonts.css);
-body{
-   font-family: open_sanslight;
+body {
+  font-family: open_sanslight;
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -o-font-smoothing: antialiased;   
+  -o-font-smoothing: antialiased;
 }
 
-h2{
+h2 {
   margin: 15px 0 0 0;
   color: hsl(0, 0%, 20%);
   font-weight: normal;
 }
-.wrap-ui-system h2{
+.wrap-ui-system h2 {
   background: url(../images/ico-plus.svg) no-repeat calc(100% - 10px) 7px;
   background-size: 20px;
   cursor: pointer;
   font-size: 20px;
 }
-.wrap-ui-system h2.do{
-  background-image: url(../images/ico-minus.svg); 
+.wrap-ui-system h2.do {
+  background-image: url(../images/ico-minus.svg);
 }
-.uiwrap{
+.uiwrap {
   display: none;
 }
 
-.line{
-	position: absolute;
-	height: 1px;
-	width: 100px;
-	background-color: blue;
+.line {
+  position: absolute;
+  height: 1px;
+  width: 100px;
+  background-color: blue;
 }
-svg{
-	border:1px solid #CECECE;
-	font-family: open_sanslight;
-	font-size: 12px;
+svg {
+  border: 1px solid #cecece;
+  font-family: open_sanslight;
+  font-size: 12px;
 }
 
 /*---clears-----*/
 .clear::after,
-.clear::before{
+.clear::before {
   content: "";
   display: table;
 }
-.clear::after{
+.clear::after {
   clear: both;
-
 }
 /*---INTERFAZ---*/
-.wrap-ui-system{
-  margin:10px;
+.wrap-ui-system {
+  margin: 10px;
 }
-.wrap-ui-system > *{
-  margin:5px 0;
+.wrap-ui-system > * {
+  margin: 5px 0;
 }
 
 /*---slider stroke--*/
 #slider,
-.elslider{
+.elslider {
   width: 55%;
   float: left;
   background: hsl(0, 0%, 40%);
@@ -69,37 +68,36 @@ svg{
   margin: 10px 2.5%;
 }
 #slider span,
-.elslider span{
-  width: 0!important;
-  height: 0!important;
-  border-radius: 0!important;
-  border: 10px solid transparent!important;
-  background: transparent!important;
-  border-bottom: 12px solid hsl(0, 0%, 40%)!important;
-  top: -7px!important;
-  cursor: pointer!important;
+.elslider span {
+  width: 0 !important;
+  height: 0 !important;
+  border-radius: 0 !important;
+  border: 10px solid transparent !important;
+  background: transparent !important;
+  border-bottom: 12px solid hsl(0, 0%, 40%) !important;
+  top: -7px !important;
+  cursor: pointer !important;
 }
 #slider span:focus,
-.elslider span:focus{
-  outline: none!important;
-
+.elslider span:focus {
+  outline: none !important;
 }
 /*--slider labels----*/
-.label{
+.label {
   color: hsl(0, 0%, 40%);
   width: 40%;
   height: 24px;
   font-size: 14px;
   overflow: hidden;
--webkit-user-select: none; /* Chrome/Safari */        
--moz-user-select: none; /* Firefox */
--ms-user-select: none; /* IE10+ */
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
   display: block;
-  float: left;  
+  float: left;
 }
 /*----TOGGLE------*/
 
-.tooglebox{
+.tooglebox {
   width: 22px;
   height: 22px;
   border: 2px solid hsl(0, 0%, 40%);
@@ -108,39 +106,39 @@ svg{
   margin-left: 10px;
   margin-top: 5px;
 }
-.check{
+.check {
   display: none;
   width: 100%;
   height: 100%;
   background: hsl(0, 0%, 40%);
-  border-radius:50%; 
+  border-radius: 50%;
 }
-.checked .check{
+.checked .check {
   display: block;
 }
-.wrapcheck .label{
+.wrapcheck .label {
   width: 50%;
 }
 /*-----LAYOUT-----*/
-.lateral{
-    max-width: 250px;
-    width: 35%;
-    background: hsl(0, 0%, 85%);
-    height: 100vh;
-    display: block;
-    float: left;
-    overflow-y: scroll;
-}
-.canvas{
-  width: 65%;
+.lateral {
+  width: 25%;
+  background: hsl(0, 0%, 85%);
+  height: 100vh;
+  display: block;
   float: left;
-  padding: 0 3%;
+  overflow-y: scroll;
 }
-#svg-wrap{
+.canvas {
+  width: 75%;
+  height: 100vh;
+  float: left;
+}
+#svg-wrap {
   width: 100%;
-      cursor: default;
+  height: 100%;
+  cursor: default;
 }
-.thesys{
+.thesys {
   border-bottom: 1px solid white;
-  padding-bottom: 15px; 
+  padding-bottom: 15px;
 }

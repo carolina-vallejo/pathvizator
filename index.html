@@ -1,54 +1,43 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8">
-<title>pathvizator2</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>pathvizator2</title>
 
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="js/jquery-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/reset.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="icon" href="images/favicon.ico" />
+  </head>
+  <body>
+    <div class="lateral">
+      <div class="selectsystem">
+        <form id="seltsystem" action="">
+          <select name="" id="select">
+            <option value="uno">circle</option>
+          </select>
+          <input type="text" placeholder="How many circles do you want?" />
+          <input type="submit" />
+        </form>
+      </div>
 
-<!-- Stylesheets -->
-<link rel="stylesheet" href="js/jquery-ui.min.css">
-<link rel="stylesheet" type="text/css" href="css/reset.css">
-<link rel="stylesheet" href="css/styles.css">
+      <div class="wrap-ui-system"></div>
+      <div class="checkconectors">
+        <form id="selconnector" action="" style="display: none;">
+          <input type="submit" />
+        </form>
+      </div>
+    </div>
+    <div class="canvas">
+      <svg id="svg-wrap"></svg>
+    </div>
 
-</head>
-<body>
-
-<div class="lateral">
-	<div class="selectsystem">
-	<form id="seltsystem" action="">
-		
-		<select name="" id="select">
-			<option value="uno">circle</option>
-		</select>
-		<input type="text">
-		<input type="submit">		
-	</form>
-
-	</div>
-
-	<div class="wrap-ui-system">			
-		
-
-	</div>
-	<div class="checkconectors">
-		<form id="selconnector" action="" style="display:none">
-			<input type="submit">
-		</form>
-	</div>
-
-</div>
-<div class="canvas">
-<svg id="svg-wrap" height="600"></svg>		
-
-</div>
-
-<script src="js/jquery-1.11.2.min.js"></script>
-<script src="js/jquery-ui.min.js"></script>
-<script src="js/d3.js"></script>
-<script src="js/interfaz.js"></script>
-<script src="js/main.js"></script>
-<script src="js/my-easy-ui.js"></script>
-
-
-</body>
+    <script src="js/jquery-1.11.2.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/d3.js"></script>
+    <!-- <script src="https://d3js.org/d3.v5.js"></script> -->
+    <script src="js/interfaz.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>
